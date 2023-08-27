@@ -90,6 +90,7 @@ const MessageCreator = ({
     return (
       <Box
         sx={{
+          width: 700,
           border: "1px solid rgba(1,1,1,0.5)",
           borderRadius: 3,
           p: 2,

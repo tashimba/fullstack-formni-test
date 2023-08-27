@@ -55,7 +55,11 @@ const CampaignPage = () => {
               <List>
                 {campaign.channels.map((el) => (
                   <ListItemButton
-                    sx={{ borderRadius: 4, border: 1, my: 1 }}
+                    sx={{
+                      borderRadius: 1,
+                      border: "1px solid rgba(1,1,1,0.4)",
+                      my: 1,
+                    }}
                     key={el}
                     selected={openChannel.selectedChannel === el}
                     onClick={() =>

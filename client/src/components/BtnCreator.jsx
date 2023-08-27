@@ -62,8 +62,10 @@ const BtnCreator = ({
             }
           }
           if (activeChannel == "tg") {
-            setButtons([...buttons, buttonText]);
-            setButtonText("");
+            if (buttonText.length) {
+              setButtons([...buttons, buttonText]);
+              setButtonText("");
+            }
           }
         }
         if (selected == "inline") {
