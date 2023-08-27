@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -16,7 +16,6 @@ import {
 import CheckIcon from "@mui/icons-material/Check";
 import { useDispatch } from "react-redux";
 import { addCampaigns } from "../redux/campaignsSlice";
-
 const DialogCampaign = ({ open, setOpen }) => {
   const [inputValue, setInputValue] = useState("");
   const dispatch = useDispatch();
@@ -25,6 +24,10 @@ const DialogCampaign = ({ open, setOpen }) => {
 
   const [channelError, setChannelError] = useState("");
   const [nameError, setNameError] = useState("");
+
+  useEffect(() => {
+    setChecked([]);
+  }, [open]);
 
   const addHandler = (name) => {
     const channels = channelsTest.filter((el, id) => checked.includes(id));
@@ -53,6 +56,7 @@ const DialogCampaign = ({ open, setOpen }) => {
 
     setChecked(newChecked);
   };
+
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
       <DialogTitle fontWeight={"600"}>Создать кампанию</DialogTitle>
