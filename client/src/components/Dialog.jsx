@@ -27,6 +27,9 @@ const DialogCampaign = ({ open, setOpen }) => {
 
   useEffect(() => {
     setChecked([]);
+    setInputValue("");
+    setChannelError("");
+    setNameError("");
   }, [open]);
 
   const addHandler = (name) => {

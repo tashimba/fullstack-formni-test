@@ -8,18 +8,29 @@ import {
   Typography,
   Alert,
 } from "@mui/material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { postChannel } from "../redux/channelSlice";
+import { addData } from "../redux/tmpChannelSlice";
 
 const MessageCreator = ({
   campaign,
   activeChannel,
-  channel,
-  setMsgs,
-  msgs,
+ 
 }) => {
   const dispatch = useDispatch();
 
+  const channelData = useSelector((state) =>
+    state.channels.channel.find(
+      (el) => el.campaignId === campaign._id && el.name === activeChannel
+    )
+  );
+
+  const tmpChannelData = useSelector((state) =>
+    state.tmpChannels.channels.find((el) => el?.name === activeChannel)
+  );
+  console.log(tmpChannelData);
+
+  const CampId = campaign._id;
   const [inputText, setInputText] = useState("");
   const [selected, setSelected] = useState("");
   const [buttons, setButtons] = useState([]);
@@ -32,16 +43,24 @@ const MessageCreator = ({
   const [noTextError, setNoTextError] = useState("");
 
   const fillData = () => {
-    if (channel) {
-      setInputText(channel.text);
-      setSelected(channel.variantButton);
-      setButtons(channel.buttons);
-      setUrlButtons(channel.urlButtons);
+    if (channelData) {
+      setInputText(channelData.text);
+      setSelected(channelData.variantButton);
+      setButtons(channelData.buttons);
+      setUrlButtons(channelData.urlButtons);
     } else {
-      setInputText("");
-      setSelected("");
-      setButtons([]);
-      setUrlButtons([]);
+      tmpChannelData?.text
+        ? setInputText(tmpChannelData?.text)
+        : setInputText("");
+      tmpChannelData?.variantButton
+        ? setSelected(tmpChannelData?.variantButton)
+        : setSelected("");
+      tmpChannelData?.buttons
+        ? setButtons(tmpChannelData?.buttons)
+        : setButtons([]);
+      tmpChannelData?.urlButtons
+        ? setUrlButtons(tmpChannelData?.urlButtons)
+        : setUrlButtons([]);
     }
   };
 
@@ -49,7 +68,32 @@ const MessageCreator = ({
     fillData();
     setNoTextError("");
     setTextError("");
-  }, [activeChannel]);
+  }, [activeChannel, channelData]);
+
+  useEffect(() => {
+    !channelData &&
+      dispatch(
+        addData({
+          CampId,
+          activeChannel,
+          inputText,
+          selected,
+          buttons,
+          buttonText,
+          buttonTextUrl,
+          buttonUrl,
+          urlButtons,
+        })
+      );
+  }, [
+    inputText,
+    selected,
+    buttons,
+    buttonText,
+    buttonTextUrl,
+    buttonUrl,
+    urlButtons,
+  ]);
 
   const sendMsg = () => {
     if (inputText.length) {
@@ -69,6 +113,7 @@ const MessageCreator = ({
 
   const changeText = (e) => {
     setTextError("");
+    setNoTextError("");
     if (activeChannel == "vk") {
       setInputText(e.target.value.slice(0, 4096));
       inputText.length > 4095 && setTextError("Текст слишком длинный");
@@ -86,7 +131,7 @@ const MessageCreator = ({
     }
   };
 
-  if (!channel) {
+  if (!channelData) {
     return (
       <Box
         sx={{
@@ -175,7 +220,7 @@ const MessageCreator = ({
             <Typography>Текст: {inputText}</Typography>
             {activeChannel != "sms" && (
               <BtnCreator
-                channelFilled={!!channel}
+                channelFilled={!!channelData}
                 selected={selected}
                 setSelected={setSelected}
                 buttons={buttons}

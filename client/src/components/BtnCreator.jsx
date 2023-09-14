@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const BtnCreator = ({
   activeChannel,
@@ -35,16 +35,34 @@ const BtnCreator = ({
   const [lenButtonsErr, setLenButtonsErr] = useState("");
   const [countUrlButtonsErr, setCountUrlButtonsErr] = useState("");
   const [urlError, setUrlError] = useState("");
+  const [alreadyUrlButtons, setAlreadyUrlButtons] = useState("");
+
+  useEffect(() => {
+    setCountButtonsErr("");
+    setAlreadyButtons("");
+    setVariantError("");
+    setUrlVariantError("");
+    setLenButtonsErr("");
+    setCountUrlButtonsErr("");
+    setButtonTextUrl("");
+    setButtonUrl("");
+    setButtonText("");
+    setAlreadyUrlButtons("");
+  }, [activeChannel]);
+
   const addButton = () => {
+    setAlreadyButtons("");
+    setLenButtonsErr("");
     if (selected) {
       if (buttons.includes(buttonText)) {
         setAlreadyButtons("Такая кнопка уже существует");
       } else {
         if (selected == "standart") {
           if (activeChannel == "vk") {
-            if (buttonText.length) {
+            if (buttonText.trim().length) {
               setButtons([...buttons, buttonText].slice(0, 40));
               setButtonText("");
+
               buttons.length > 39 &&
                 setCountButtonsErr("Максимальное количество кнопок - 40");
             }
@@ -107,31 +125,37 @@ const BtnCreator = ({
   };
 
   const addUrlButton = () => {
+    setAlreadyUrlButtons("");
+    setUrlError("");
     if (selected) {
-      if (selected != "inline" && activeChannel != "wa") {
-        if (buttonTextUrl.length && buttonUrl.length && isURL(buttonUrl)) {
-          setUrlButtons([
-            ...urlButtons,
-            { text: buttonTextUrl, url: buttonUrl },
-          ]);
-          setButtonTextUrl("");
-          setButtonUrl("");
-        }
+      if (!!urlButtons.find((el) => el.text == buttonTextUrl)) {
+        setAlreadyUrlButtons("Такая кнопка уже существует");
       } else {
-        if (buttonTextUrl.length && buttonUrl.length && isURL(buttonUrl)) {
-          if (urlButtons.length == 1) {
-            setCountUrlButtonsErr(
-              "Максимальное количество кнопок с ссылкой - 1"
-            );
-          } else {
-            setUrlButtons(
-              [...urlButtons, { text: buttonTextUrl, url: buttonUrl }].slice(
-                0,
-                1
-              )
-            );
+        if (selected != "inline" && activeChannel != "wa") {
+          if (buttonTextUrl.length && buttonUrl.length && isURL(buttonUrl)) {
+            setUrlButtons([
+              ...urlButtons,
+              { text: buttonTextUrl, url: buttonUrl },
+            ]);
             setButtonTextUrl("");
             setButtonUrl("");
+          }
+        } else {
+          if (buttonTextUrl.length && buttonUrl.length && isURL(buttonUrl)) {
+            if (urlButtons.length == 1) {
+              setCountUrlButtonsErr(
+                "Максимальное количество кнопок с ссылкой - 1"
+              );
+            } else {
+              setUrlButtons(
+                [...urlButtons, { text: buttonTextUrl, url: buttonUrl }].slice(
+                  0,
+                  1
+                )
+              );
+              setButtonTextUrl("");
+              setButtonUrl("");
+            }
           }
         }
       }
@@ -143,6 +167,7 @@ const BtnCreator = ({
   const changeSelect = (e) => {
     setSelected(e.target.value);
     setVariantError("");
+    setUrlVariantError("");
 
     if (checkBan) {
       setUrlButtons([]);
@@ -289,6 +314,16 @@ const BtnCreator = ({
                   Добавить
                 </Button>
               </Stack>
+              {alreadyUrlButtons && (
+                <Alert
+                  onClose={() => {
+                    setAlreadyUrlButtons("");
+                  }}
+                  severity="error"
+                >
+                  {alreadyUrlButtons}
+                </Alert>
+              )}
               {countUrlButtonsErr && (
                 <Alert
                   onClose={() => {
@@ -334,7 +369,7 @@ const BtnCreator = ({
                   label={el.text}
                   onDelete={() =>
                     setUrlButtons(
-                      urlButtons.filter((btn) => btn.url !== el.url)
+                      urlButtons.filter((btn) => btn.text !== el.text)
                     )
                   }
                   variant="outlined"

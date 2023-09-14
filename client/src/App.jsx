@@ -1,4 +1,5 @@
 import CampaignPage from "./pages/CampaignPage";
+import ErrorPage from "./pages/ErrorPage";
 import HomePage from "./pages/HomePage";
 import { Route, Routes } from "react-router-dom";
 

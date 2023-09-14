@@ -13,10 +13,12 @@ import {
   getChannels,
   getOneChannel,
 } from "./controllers/ChannelControllers.js";
+import "dotenv/config";
 
 mongoose
   .connect(
-    "mongodb+srv://timur:qwenpass@cluster0.ct4dmc8.mongodb.net/fromni?retryWrites=true&w=majority"
+    `mongodb+srv://${process.env.username}:${process.env.password}@cluster0.ct4dmc8.mongodb.net/fromni?retryWrites=true&w=majority`
+    // "mongodb+srv://timur:qwenpass@cluster0.ct4dmc8.mongodb.net/?retryWrites=true&w=majority"
   )
   .then(() => console.log("bd ok"))
   .catch((er) => console.log(er));
@@ -38,3 +40,5 @@ app.get("/channels/:id", getOneChannel);
 app.listen(5000, (err) => {
   err ? console.log(err) : console.log("server OK");
 });
+
+console.log(process.env.username);
